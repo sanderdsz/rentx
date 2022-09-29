@@ -32,6 +32,7 @@ import {
 import { Button } from "../../components/Button";
 
 import { CarDTO } from "../../dtos/CarDTO";
+import { getAccessoryIcon } from "../../utils/getAccessoryItem";
 
 interface Params {
   car: CarDTO;
@@ -45,7 +46,7 @@ export function CarDetails() {
   const { car } = route.params as Params;
 
   function handleConfirmDetail() {
-    navigation.navigate("Schedule");
+    navigation.navigate("Schedule", { car });
   }
 
   function handleGoBackScreen() {
@@ -85,7 +86,7 @@ export function CarDetails() {
             <Accessory
               key={accessory.type}
               name={accessory.name}
-              icon={SpeedSvg}
+              icon={getAccessoryIcon(accessory.type)}
             />
           ))}
         </Accessories>
