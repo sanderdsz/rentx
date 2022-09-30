@@ -1,21 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/core";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import { Accessory } from "../../components/Accessory";
 import { BackButton } from "../../components/BackButton";
 import { ImageSlider } from "../../components/ImageSlider";
 
-import SpeedSvg from "../../assets/speed.svg";
-import AccelerationSvg from "../../assets/acceleration.svg";
-import ForceSvg from "../../assets/force.svg";
-import GasolineSvg from "../../assets/gasoline.svg";
-import ExchangeSvg from "../../assets/exchange.svg";
-import PeopleSvg from "../../assets/people.svg";
-
 import {
   About,
   Accessories,
+  AnimatedCarImages,
+  AnimatedContent,
+  AnimatedHeaderAndSlider,
   Brand,
   CarImages,
   Container,
@@ -33,6 +36,7 @@ import { Button } from "../../components/Button";
 
 import { CarDTO } from "../../dtos/CarDTO";
 import { getAccessoryIcon } from "../../utils/getAccessoryItem";
+import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 interface Params {
   car: CarDTO;
@@ -40,6 +44,32 @@ interface Params {
 
 export function CarDetails() {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
+  const statusBarHeight = getStatusBarHeight();
+
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    console.log(event.contentOffset.y);
+    scrollY.value = event.contentOffset.y;
+  });
+
+  const headerStyleAnimation = useAnimatedStyle(() => {
+    return {
+      height: interpolate(
+        scrollY.value,
+        [0, 200],
+        [200, statusBarHeight + 50],
+        Extrapolate.CLAMP
+      ),
+    };
+  });
+
+  const sliderCarsStyleAnimation = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(scrollY.value, [0, 150], [1, 0], Extrapolate.CLAMP),
+    };
+  });
 
   const route = useRoute();
 
@@ -53,22 +83,21 @@ export function CarDetails() {
     navigation.goBack();
   }
 
+  useEffect(() => {});
+
   return (
     <Container>
-      <Header>
-        <BackButton onPress={handleGoBackScreen} />
-      </Header>
+      <AnimatedHeaderAndSlider style={headerStyleAnimation}>
+        <Header>
+          <BackButton onPress={handleGoBackScreen} />
+        </Header>
 
-      <CarImages>
-        <ImageSlider imagesUrl={car.photos} />
-      </CarImages>
+        <AnimatedCarImages style={sliderCarsStyleAnimation}>
+          <ImageSlider imagesUrl={car.photos} />
+        </AnimatedCarImages>
+      </AnimatedHeaderAndSlider>
 
-      <Content
-        contentContainerStyle={{
-          padding: 24,
-          alignItems: "center",
-        }}
-      >
+      <AnimatedContent onScroll={scrollHandler} scrollEventThrottle={16}>
         <Details>
           <Description>
             <Brand>{car.brand}</Brand>
@@ -92,7 +121,7 @@ export function CarDetails() {
         </Accessories>
 
         <About>{car.about}</About>
-      </Content>
+      </AnimatedContent>
 
       <Footer>
         <Button title="Confirmar" onPress={handleConfirmDetail} />
