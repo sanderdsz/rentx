@@ -4,7 +4,7 @@ import {
   ParamListBase,
   useNavigation,
 } from "@react-navigation/native";
-import { StatusBar, StyleSheet } from "react-native";
+import { BackHandler, StatusBar, StyleSheet } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "styled-components";
@@ -31,6 +31,7 @@ import api from "../../services/api";
 import { CarDTO } from "../../dtos/CarDTO";
 import { Load } from "../../components/Load";
 import { RectButton, PanGestureHandler } from "react-native-gesture-handler";
+import { LoadAnimation } from "../../components/LoadAnimation";
 
 const ButtonAnimated = Animated.createAnimatedComponent(RectButton);
 
@@ -93,6 +94,12 @@ export function Home() {
     fetchCars();
   }, []);
 
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      return true;
+    });
+  }, []);
+
   return (
     <Container>
       <StatusBar
@@ -108,7 +115,7 @@ export function Home() {
       </Header>
 
       {loading ? (
-        <Load />
+        <LoadAnimation />
       ) : (
         <CarList
           data={cars}
