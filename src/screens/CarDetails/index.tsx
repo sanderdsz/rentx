@@ -50,7 +50,6 @@ export function CarDetails() {
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
-    console.log(event.contentOffset.y);
     scrollY.value = event.contentOffset.y;
   });
 
@@ -105,8 +104,8 @@ export function CarDetails() {
           </Description>
 
           <Rent>
-            <Period>{car.rent.period}</Period>
-            <Price>R$ ${car.rent.price}</Price>
+            <Period>{car.period}</Period>
+            <Price>R$ ${car.price}</Price>
           </Rent>
         </Details>
 

@@ -17,6 +17,7 @@ import {
   ParamListBase,
   useNavigation,
 } from "@react-navigation/native";
+import { useAuth } from "../../hooks/auth";
 
 export function SignIn() {
   const [email, setEmail] = useState("");
@@ -25,6 +26,8 @@ export function SignIn() {
   const theme = useTheme();
 
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
+  const { signIn, user } = useAuth();
 
   async function handleSignUp() {
     navigation.navigate("SignUpFirstStep");
@@ -40,6 +43,8 @@ export function SignIn() {
       });
 
       await schema.validate({ email, password });
+
+      signIn({ email, password });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         return Alert.alert("Erro na autenticação", error.message);

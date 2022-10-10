@@ -32,6 +32,7 @@ import { CarDTO } from "../../dtos/CarDTO";
 import { Load } from "../../components/Load";
 import { RectButton, PanGestureHandler } from "react-native-gesture-handler";
 import { LoadAnimation } from "../../components/LoadAnimation";
+import AppLoading from "expo-app-loading";
 
 const ButtonAnimated = Animated.createAnimatedComponent(RectButton);
 
@@ -110,7 +111,13 @@ export function Home() {
       <Header>
         <HeaderContent>
           <Logo width={RFValue(108)} height={RFValue(12)} />
-          <TotalCars>Total de 12 carros</TotalCars>
+          {loading ? (
+            <TotalCars>
+              <AppLoading />
+            </TotalCars>
+          ) : (
+            <TotalCars>Total de {cars.length} carros</TotalCars>
+          )}
         </HeaderContent>
       </Header>
 

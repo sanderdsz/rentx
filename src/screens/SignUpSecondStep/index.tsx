@@ -40,8 +40,6 @@ export function SignUpSecondStep() {
   const route = useRoute();
 
   const { user } = route.params as Params;
-  console.log(user);
-
   function handleBack() {
     navigation.goBack();
   }
