@@ -80,11 +80,16 @@ export function Home() {
   }
 
   useEffect(() => {
+    // Memory leak issues fix
+    let isMounted = true;
+
     async function fetchCars() {
       try {
         const response = await api.get("/cars");
 
-        setCars(response.data);
+        if (isMounted) {
+          setCars(response.data);
+        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -93,6 +98,10 @@ export function Home() {
     }
 
     fetchCars();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
