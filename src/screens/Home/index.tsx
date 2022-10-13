@@ -4,7 +4,7 @@ import {
   ParamListBase,
   useNavigation,
 } from "@react-navigation/native";
-import { BackHandler, StatusBar, StyleSheet } from "react-native";
+import { Alert, BackHandler, StatusBar, StyleSheet } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "styled-components";
@@ -14,6 +14,7 @@ import Animated, {
   useAnimatedGestureHandler,
   withSpring,
 } from "react-native-reanimated";
+import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
 
 import { Car } from "../../components/Car";
 import Logo from "../../assets/logo.svg";
@@ -43,6 +44,8 @@ export function Home() {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const theme = useTheme();
+
+  const netInfo = useNetInfo();
 
   const positionY = useSharedValue(0);
   const positionX = useSharedValue(0);
@@ -109,6 +112,14 @@ export function Home() {
       return true;
     });
   }, []);
+
+  useEffect(() => {
+    if (netInfo.isConnected) {
+      Alert.alert("Online");
+    } else {
+      Alert.alert("Offline");
+    }
+  }, [netInfo.isConnected]);
 
   return (
     <Container>

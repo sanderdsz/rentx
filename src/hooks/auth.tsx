@@ -32,6 +32,8 @@ interface SignInCredentials {
 interface AuthContextData {
   user: User;
   signIn: (crendentials: SignInCredentials) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateUser: (user: User) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -62,12 +64,54 @@ function AuthProvider({ children }: AuthProviderProps) {
           newUser.name = user.name;
           newUser.email = user.email;
           newUser.avatar = user.avatar;
-          newUser.drive_license = user.drive_license;
+          newUser.driver_license = user.drive_license;
           newUser.token = token;
         });
       });
 
       setData({ ...user, token });
+    } catch (error) {
+      console.log(error);
+
+      throw new Error(error);
+    }
+  }
+
+  async function signOut() {
+    try {
+      await database.write(async () => {
+        const userCollection = await database.get<UserModel>("users");
+
+        const userSelected = await userCollection.find(data.id);
+
+        await userSelected.destroyPermanently();
+
+        setData({} as User);
+      });
+    } catch (error) {
+      console.log(error);
+
+      throw new Error(error);
+    }
+  }
+
+  async function updateUser(user: User) {
+    console.log(user);
+
+    try {
+      await database.write(async () => {
+        const userCollection = await database.get<UserModel>("users");
+
+        const userSelected = await userCollection.find(data.id);
+
+        await userSelected.update((userData) => {
+          userData.name = user.name;
+          userData.driver_license = user.driver_license;
+          userData.avatar = user.avatar;
+        });
+
+        setData(user);
+      });
     } catch (error) {
       console.log(error);
 
@@ -96,7 +140,7 @@ function AuthProvider({ children }: AuthProviderProps) {
   });
 
   return (
-    <AuthContext.Provider value={{ user: data, signIn }}>
+    <AuthContext.Provider value={{ user: data, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
